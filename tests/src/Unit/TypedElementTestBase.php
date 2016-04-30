@@ -67,7 +67,8 @@ abstract class TypedElementTestBase extends UnitTestCase {
     $typedDataProphecy
       ->createDataDefinition($definition->getDataType())
       ->willReturn($definition);
-    $typedDataProphecy->getDefinition($definition->getDataType())->willReturN($definition);
+    $typedDataProphecy->getDefinition($definition->getDataType())->willReturn($definition);
+    $typedDataProphecy->getDefinitions()->willReturn([$definition->getDataType() => $definition]);
     return $typedDataProphecy->reveal();
   }
 }

@@ -232,10 +232,16 @@ class TypedElementBuilder {
   protected function getElementTypeFromDefinition(DataDefinitionInterface $definition) {
     $type = 'textfield';
 
+    $implementations = class_implements($definition->getClass());
+
     if ($definition->getDataType() === 'boolean') {
       $type = 'checkbox';
     }
-    elseif ($definition->getDataType() === 'integer' || $definition->getDataType() === 'float') {
+    elseif (in_array('Drupal\Core\TypedData\Type\DateTimeInterface', $implementations)) {
+      $type = 'datetime';
+    }
+    elseif (in_array('Drupal\Core\TypedData\Type\IntegerInterface', $implementations) ||
+        in_array('Drupal\Core\TypedData\Type\FloatInterface', $implementations)) {
       $type = 'number';
     }
     elseif ($definition->getConstraint('AllowedValues') || $definition->getConstraint('Choice')) {

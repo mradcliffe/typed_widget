@@ -30,6 +30,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $booleanDefinition = DataDefinition::create('boolean');
     $booleanDefinition->setLabel($expected['#title']);
+    $booleanDefinition->setClass('\Drupal\Core\TypedData\Plugin\DataType\BooleanData');
     $typedDataManager = $this->getTypedDataMock($booleanDefinition);
 
     // Set the container
@@ -58,6 +59,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $stringDefinition = DataDefinition::create('string');
     $stringDefinition
+      ->setClass('\Drupal\Core\TypedData\Plugin\DataType\StringData')
       ->setLabel($expected['#title'])
       ->setDescription($expected['#description'])
       ->setRequired(TRUE);
@@ -90,6 +92,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $integerDefinition = DataDefinition::create('integer');
     $integerDefinition
+      ->setClass('\Drupal\Core\TypedData\Plugin\DataType\IntegerData')
       ->setLabel($expected['#title'])
       ->setDescription($expected['#description'])
       ->addConstraint('Range', ['min' => 0, 'max' => 10]);
@@ -125,6 +128,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $floatDefinition = DataDefinition::create('float');
     $floatDefinition
+      ->setClass('\Drupal\Core\TypedData\Plugin\DataType\FloatData')
       ->setLabel($expected['#title'])
       ->setDescription($expected['#description'])
       ->addConstraint('Range', ['min' => 0, 'max' => 10]);
@@ -143,6 +147,66 @@ class PrimitiveElementTest extends TypedElementTestBase {
     );
 
     $element = $elementBuilder->getElementFor('float');
+    $this->assertEquals($expected, $element);
+  }
+
+  /**
+   * Assert that datetime element is returned for timestamp.
+   */
+  public function testTimestamp() {
+    $expected = [
+      '#type' => 'datetime',
+      '#title' => $this->getRandomGenerator()->name(),
+      '#description' => '',
+    ];
+
+    $timeDefinition = DataDefinition::create('timestamp');
+    $timeDefinition
+      ->setClass('\Drupal\Core\TypedData\Plugin\DataType\Timestamp')
+      ->setLabel($expected['#title'])
+      ->setDescription($expected['#description']);
+    $typedDataManager = $this->getTypedDataMock($timeDefinition);
+
+    // Set the container
+    $this->setContainer($typedDataManager);
+
+    $elementBuilder = new TypedElementBuilder(
+      $typedDataManager,
+      $this->getLogger(),
+      $this->getModuleHandlerMock()
+    );
+
+    $element = $elementBuilder->getElementFor('timestamp');
+    $this->assertEquals($expected, $element);
+  }
+
+  /**
+   * Assert that datetime element is returned for datetimeiso8601.
+   */
+  public function testDatetimeISO8601() {
+    $expected = [
+      '#type' => 'datetime',
+      '#title' => $this->getRandomGenerator()->name(),
+      '#description' => '',
+    ];
+
+    $timeDefinition = DataDefinition::create('datetime_iso8601');
+    $timeDefinition
+      ->setClass('\Drupal\Core\TypedData\Plugin\DataType\DateTimeIso8601')
+      ->setLabel($expected['#title'])
+      ->setDescription($expected['#description']);
+    $typedDataManager = $this->getTypedDataMock($timeDefinition);
+
+    // Set the container
+    $this->setContainer($typedDataManager);
+
+    $elementBuilder = new TypedElementBuilder(
+      $typedDataManager,
+      $this->getLogger(),
+      $this->getModuleHandlerMock()
+    );
+
+    $element = $elementBuilder->getElementFor('datetime_iso8601');
     $this->assertEquals($expected, $element);
   }
 }
