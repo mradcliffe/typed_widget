@@ -28,8 +28,7 @@ before_script:
   - cd drupal-${DRUPAL}
 
 script:
-  - ./vendor/bin/phpunit --bootstrap core/tests/bootstrap.php --coverage-text=$TRAVIS_BUILD_DIR/coverage.txt modules/typed_widget
+  - ./vendor/bin/phpunit -c drupal-${DRUPAL}/modules/typed_widget/phpunit.xml.dist --coverage-text=$TRAVIS_BUILD_DIR/coverage.txt
 
 after_script:
   - cat $TRAVIS_BUILD_DIR/coverage.txt
-
