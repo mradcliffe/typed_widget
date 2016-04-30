@@ -1,0 +1,5 @@
+type: module
+name: 'Typed Widgets'
+description: 'Provides a service to dynamically create form elements for Typed Data data definition.'
+core: 8.x
+package: 'Typed Data'
