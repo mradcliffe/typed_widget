@@ -272,4 +272,37 @@ class PrimitiveElementTest extends TypedElementTestBase {
     $element = $elementBuilder->getElementFor('duration_iso8601');
     $this->assertEquals($expected, $element);
   }
+
+  /**
+   * Assert that a select element is returned for a data type that has
+   * AllowedValues constraint.
+   */
+  public function testAllowedValues() {
+    $expected = [
+      '#type' => 'select',
+      '#title' => $this->getRandomGenerator()->name(),
+      '#description' => '',
+      '#options' => ['one' => 'One', 'two' => 'Two', 'three' => 'Three'],
+    ];
+
+    $stringDefinition = DataDefinition::create('string');
+    $stringDefinition
+      ->setClass('\Drupal\Core\TypedData\Plugin\DataType\StringData')
+      ->setLabel($expected['#title'])
+      ->setDescription($expected['#description'])
+      ->addConstraint('Choice', ['choices' => $expected['#options']]);
+    $typedDataManager = $this->getTypedDataMock($stringDefinition, ['Choice' => ['choices' => $expected['#options']]]);
+
+    // Set the container
+    $this->setContainer($typedDataManager);
+
+    $elementBuilder = new TypedElementBuilder(
+      $typedDataManager,
+      $this->getLogger(),
+      $this->getModuleHandlerMock()
+    );
+
+    $element = $elementBuilder->getElementFor('string');
+    $this->assertEquals($expected, $element);
+  }
 }

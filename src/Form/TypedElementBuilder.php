@@ -274,7 +274,12 @@ class TypedElementBuilder {
 
     if ($type === 'select') {
       // Add the Constraint options to the select element.
-      $properties['#options'] = $definition->getConstraint('AllowedValues')['choices'];
+      $properties['#options'] = array_reduce($definition->getConstraints(), function(&$result, $constraint) {
+        if (isset($constraint['choices'])) {
+          $result = $constraint['choices'];
+        }
+        return $result;
+      }, []);
     }
     elseif ($type === 'number') {
       $options = $definition->getConstraint('Range');
