@@ -91,12 +91,13 @@ class TypedElementBuilder {
       }
       else {
         // Get the element for the definition.
-        $element_type = $this->getElementTypeFromDefinition($definition);
+        $element_type = PrimitiveElementBuilder::getType($definition);
         $element = [
           '#type' => $element_type,
           '#title' => $definition->getLabel(),
           '#description' => $definition->getDescription() ? $definition->getDescription() : '',
         ];
+        $element += PrimitiveElementBuilder::getProperties($element_type, $definition);
         $element += $this->getAdditionalProperties($element_type, $definition);
       }
     }
@@ -269,30 +270,6 @@ class TypedElementBuilder {
    */
   protected function getAdditionalProperties($type, DataDefinitionInterface $definition, $parent_type = '') {
     $properties = [];
-
-    $implementations = class_implements($definition->getClass());
-
-    if ($type === 'select') {
-      // Add the Constraint options to the select element.
-      $properties['#options'] = array_reduce($definition->getConstraints(), function(&$result, $constraint) {
-        if (isset($constraint['choices'])) {
-          $result = $constraint['choices'];
-        }
-        return $result;
-      }, []);
-    }
-    elseif ($type === 'number') {
-      $options = $definition->getConstraint('Range');
-      if ($options) {
-        $properties['#min'] = $options['min'];
-        $properties['#max'] = $options['max'];
-      }
-      elseif (in_array('Drupal\Core\TypedData\Type\DurationInterface', $implementations)) {
-        $properties['#min'] = 0;
-        // @todo constant
-        $properties['#max'] = 86400;
-      }
-    }
 
     if ($definition->isRequired()) {
       $properties['#required'] = TRUE;
