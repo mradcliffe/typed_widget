@@ -235,7 +235,10 @@ class TypedElementBuilder {
     if ($definition->getDataType() === 'boolean') {
       $type = 'checkbox';
     }
-    elseif ($definition->getConstraint('AllowedValues')) {
+    elseif ($definition->getDataType() === 'integer' || $definition->getDataType() === 'float') {
+      $type = 'number';
+    }
+    elseif ($definition->getConstraint('AllowedValues') || $definition->getConstraint('Choice')) {
       $type = 'select';
     }
 
@@ -264,6 +267,11 @@ class TypedElementBuilder {
     if ($type === 'select') {
       // Add the Constraint options to the select element.
       $properties['#options'] = $definition->getConstraint('AllowedValues')['choices'];
+    }
+    elseif ($type === 'number') {
+      $options = $definition->getConstraint('Range');
+      $properties['#min'] = $options['min'];
+      $properties['#max'] = $options['max'];
     }
 
     if ($definition->isRequired()) {

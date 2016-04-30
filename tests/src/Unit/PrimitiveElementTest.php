@@ -7,6 +7,7 @@
 
 namespace Drupal\Tests\typed_widget\Unit;
 
+
 use Drupal\typed_widget\Form\TypedElementBuilder;
 use Drupal\Core\TypedData\DataDefinition;
 
@@ -75,4 +76,73 @@ class PrimitiveElementTest extends TypedElementTestBase {
     $this->assertEquals($expected, $element);
   }
 
+  /**
+   * Assert that number widget used for integers.
+   */
+  public function testInteger() {
+    $expected = [
+      '#type' => 'number',
+      '#title' => $this->getRandomGenerator()->name(),
+      '#description' => '',
+      '#min' => 0,
+      '#max' => 10
+    ];
+
+    $integerDefinition = DataDefinition::create('integer');
+    $integerDefinition
+      ->setLabel($expected['#title'])
+      ->setDescription($expected['#description'])
+      ->addConstraint('Range', ['min' => 0, 'max' => 10]);
+    $constraints = [
+      'Range' => ['min' => 0, 'max' => 10]
+    ];
+    $typedDataManager = $this->getTypedDataMock($integerDefinition, $constraints);
+
+    // Set the container
+    $this->setContainer($typedDataManager);
+
+    $elementBuilder = new TypedElementBuilder(
+      $typedDataManager,
+      $this->getLogger(),
+      $this->getModuleHandlerMock()
+    );
+
+    $element = $elementBuilder->getElementFor('integer');
+    $this->assertEquals($expected, $element);
+  }
+
+  /**
+   * Assert that number element is used for float
+   */
+  public function testFloat() {
+    $expected = [
+      '#type' => 'number',
+      '#title' => $this->getRandomGenerator()->name(),
+      '#description' => '',
+      '#min' => 0,
+      '#max' => 10
+    ];
+
+    $floatDefinition = DataDefinition::create('float');
+    $floatDefinition
+      ->setLabel($expected['#title'])
+      ->setDescription($expected['#description'])
+      ->addConstraint('Range', ['min' => 0, 'max' => 10]);
+    $constraints = [
+      'Range' => ['min' => 0, 'max' => 10]
+    ];
+    $typedDataManager = $this->getTypedDataMock($floatDefinition, $constraints);
+
+    // Set the container
+    $this->setContainer($typedDataManager);
+
+    $elementBuilder = new TypedElementBuilder(
+      $typedDataManager,
+      $this->getLogger(),
+      $this->getModuleHandlerMock()
+    );
+
+    $element = $elementBuilder->getElementFor('float');
+    $this->assertEquals($expected, $element);
+  }
 }
