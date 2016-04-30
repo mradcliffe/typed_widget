@@ -1,0 +1,7 @@
+/.idea/
+/nbproject/
+.DS_Store
+*.patch
+interdiff.txt
+/vendor/
+/coverage/

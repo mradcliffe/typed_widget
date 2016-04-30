@@ -1,0 +1,14 @@
+{
+    "name": "drupal/typed_widget",
+    "description": "Provides a service to dynamically create form elements for a Typed Data data definition.",
+    "type": "drupal-module",
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "Matthew Radcliffe",
+            "email": "mradcliffe@softpixel.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
