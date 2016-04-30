@@ -209,4 +209,67 @@ class PrimitiveElementTest extends TypedElementTestBase {
     $element = $elementBuilder->getElementFor('datetime_iso8601');
     $this->assertEquals($expected, $element);
   }
+
+  /**
+   * Assert that a number element with min and max are set appropriately for a
+   * timespan data type.
+   */
+  public function testTimespan() {
+    $expected = [
+      '#type' => 'number',
+      '#title' => $this->getRandomGenerator()->name(),
+      '#description' => '',
+      '#min' => 0,
+      '#max' => 86400
+    ];
+
+    $durationDefinition = DataDefinition::create('timespan');
+    $durationDefinition
+      ->setClass('\Drupal\Core\TypedData\Plugin\DataType\TimeSpan')
+      ->setLabel($expected['#title'])
+      ->setDescription($expected['#description']);
+    $typedDataManager = $this->getTypedDataMock($durationDefinition);
+
+    // Set the container
+    $this->setContainer($typedDataManager);
+
+    $elementBuilder = new TypedElementBuilder(
+      $typedDataManager,
+      $this->getLogger(),
+      $this->getModuleHandlerMock()
+    );
+
+    $element = $elementBuilder->getElementFor('timespan');
+    $this->assertEquals($expected, $element);
+  }
+
+  /**
+   * Assert that a textfield element is provided for a duration_iso8601 type.
+   */
+  public function testDurationIso8601() {
+    $expected = [
+      '#type' => 'textfield',
+      '#title' => $this->getRandomGenerator()->name(),
+      '#description' => '',
+    ];
+
+    $stringDefinition = DataDefinition::create('duration_iso8601');
+    $stringDefinition
+      ->setClass('\Drupal\Core\TypedData\Plugin\DataType\DurationIso8601')
+      ->setLabel($expected['#title'])
+      ->setDescription($expected['#description']);
+    $typedDataManager = $this->getTypedDataMock($stringDefinition);
+
+    // Set the container
+    $this->setContainer($typedDataManager);
+
+    $elementBuilder = new TypedElementBuilder(
+      $typedDataManager,
+      $this->getLogger(),
+      $this->getModuleHandlerMock()
+    );
+
+    $element = $elementBuilder->getElementFor('duration_iso8601');
+    $this->assertEquals($expected, $element);
+  }
 }

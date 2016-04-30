@@ -270,14 +270,23 @@ class TypedElementBuilder {
   protected function getAdditionalProperties($type, DataDefinitionInterface $definition, $parent_type = '') {
     $properties = [];
 
+    $implementations = class_implements($definition->getClass());
+
     if ($type === 'select') {
       // Add the Constraint options to the select element.
       $properties['#options'] = $definition->getConstraint('AllowedValues')['choices'];
     }
     elseif ($type === 'number') {
       $options = $definition->getConstraint('Range');
-      $properties['#min'] = $options['min'];
-      $properties['#max'] = $options['max'];
+      if ($options) {
+        $properties['#min'] = $options['min'];
+        $properties['#max'] = $options['max'];
+      }
+      elseif (in_array('Drupal\Core\TypedData\Type\DurationInterface', $implementations)) {
+        $properties['#min'] = 0;
+        // @todo constant
+        $properties['#max'] = 86400;
+      }
     }
 
     if ($definition->isRequired()) {
