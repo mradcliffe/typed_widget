@@ -24,7 +24,7 @@ install:
 
 before_script:
   # Deploy the Drupal module into the Drupal modules directory.
-  - rsync -rtlDPvc --exclude .git/ "${TESTDIR}" drupal-${DRUPAL}/modules/"
+  - rsync -rtlDPvc --exclude .git/ "${TESTDIR}" drupal-${DRUPAL}/modules/
   - cd drupal-${DRUPAL}
 
 script:
@@ -32,3 +32,4 @@ script:
 
 after_script:
   - cat $TRAVIS_BUILD_DIR/coverage.txt
+
