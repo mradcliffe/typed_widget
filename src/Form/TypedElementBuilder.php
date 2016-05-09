@@ -91,12 +91,13 @@ class TypedElementBuilder {
       }
       else {
         // Get the element for the definition.
-        $element_type = $this->getElementTypeFromDefinition($definition);
+        $element_type = PrimitiveElementBuilder::getType($definition);
         $element = [
           '#type' => $element_type,
           '#title' => $definition->getLabel(),
           '#description' => $definition->getDescription() ? $definition->getDescription() : '',
         ];
+        $element += PrimitiveElementBuilder::getProperties($element_type, $definition);
         $element += $this->getAdditionalProperties($element_type, $definition);
       }
     }
@@ -232,10 +233,19 @@ class TypedElementBuilder {
   protected function getElementTypeFromDefinition(DataDefinitionInterface $definition) {
     $type = 'textfield';
 
+    $implementations = class_implements($definition->getClass());
+
     if ($definition->getDataType() === 'boolean') {
       $type = 'checkbox';
     }
-    elseif ($definition->getConstraint('AllowedValues')) {
+    elseif (in_array('Drupal\Core\TypedData\Type\DateTimeInterface', $implementations)) {
+      $type = 'datetime';
+    }
+    elseif (in_array('Drupal\Core\TypedData\Type\IntegerInterface', $implementations) ||
+        in_array('Drupal\Core\TypedData\Type\FloatInterface', $implementations)) {
+      $type = 'number';
+    }
+    elseif ($definition->getConstraint('AllowedValues') || $definition->getConstraint('Choice')) {
       $type = 'select';
     }
 
@@ -260,11 +270,6 @@ class TypedElementBuilder {
    */
   protected function getAdditionalProperties($type, DataDefinitionInterface $definition, $parent_type = '') {
     $properties = [];
-
-    if ($type === 'select') {
-      // Add the Constraint options to the select element.
-      $properties['#options'] = $definition->getConstraint('AllowedValues')['choices'];
-    }
 
     if ($definition->isRequired()) {
       $properties['#required'] = TRUE;

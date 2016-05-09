@@ -56,8 +56,8 @@ abstract class TypedElementTestBase extends UnitTestCase {
    *
    * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
    *   The definition to create.
-   * @param \Symfony\Component\Validator\Constraint[] $constraints
-   *   An array of constraints to use.
+   * @param array $constraints
+   *   An array of constraint definitions keyed by constraint name.
    * @return \Drupal\Core\TypedData\TypedDataManagerInterface
    *   Typed Data Manager.
    */
@@ -67,6 +67,8 @@ abstract class TypedElementTestBase extends UnitTestCase {
     $typedDataProphecy
       ->createDataDefinition($definition->getDataType())
       ->willReturn($definition);
+    $typedDataProphecy->getDefinition($definition->getDataType())->willReturn($definition);
+    $typedDataProphecy->getDefinitions()->willReturn([$definition->getDataType() => $definition]);
     return $typedDataProphecy->reveal();
   }
 }
