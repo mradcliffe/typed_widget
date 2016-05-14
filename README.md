@@ -1,5 +1,7 @@
 # Typed Widget
 
+[![Build Status](https://travis-ci.org/mradcliffe/typed_widget.svg?branch=8.x-1.x)](https://travis-ci.org/mradcliffe/typed_widget)
+
 Typed Widget provides a service to dynamically create form elements based on [Typed Data](https://www.drupal.org/node/1794140) data types.
 
 
@@ -13,8 +15,7 @@ Typed Widget provides a service to dynamically create form elements based on [Ty
 
 ### Field Items
 
-   * 
-
 ### Map-based Complex Data
 
 ### Primitive Types
+

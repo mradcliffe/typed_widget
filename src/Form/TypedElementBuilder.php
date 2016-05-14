@@ -11,7 +11,6 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\TypedData\ComplexDataDefinitionBase;
 use Drupal\Core\TypedData\DataDefinitionInterface;
-use Drupal\Core\TypedData\ListDataDefinition;
 use Drupal\Core\TypedData\ListDataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 
@@ -24,6 +23,7 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
  * // Get form element required for a primitive data type.
  * $formBuilder = \Drupal::service('typed_widget.element_builder');
  * $form['date'] = $formBuilder->getElementFor('datetime_iso8601');
+ * $form['string'] = $formBuilder->getElementForDefinition(DataDefinition::create('string'));
  * @endcode
  */
 class TypedElementBuilder {
@@ -76,6 +76,10 @@ class TypedElementBuilder {
     try {
       $definition = $this->typedDataManager->createDataDefinition($plugin_id);
 
+      if ($definition->isComputed() || $definition->isReadOnly()) {
+        return $element;
+      }
+
       if (is_subclass_of($definition, '\Drupal\Core\TypedData\ComplexDataDefinitionBase')) {
         if (empty($property_name)) {
           // Get all elements for the definition.
@@ -83,10 +87,11 @@ class TypedElementBuilder {
         }
         else {
           // Get the element for the property of the definition.
-          $element = $this->getElementForDefinition($definition, $property_name);
+          $element = $this->getElementForDefinition($definition->getPropertyDefinition($property_name));
         }
       }
-      elseif ($definition instanceof ListDataDefinitionInterface) {
+      elseif ($definition->isList()) {
+        // @todo This may need to be moved above.
         $element = $this->getElementsForListDefinition($definition);
       }
       else {
@@ -127,6 +132,7 @@ class TypedElementBuilder {
 
     // Each property definition needs to be analysed to find out the best
     // element match.
+    /** @var \Drupal\Core\TypedData\DataDefinitionInterface $definition */
     foreach ($parent_definition->getPropertyDefinitions() as $name => $definition) {
       // Read-only properties should not be added to the element.
       if (!$definition->isReadOnly()) {
@@ -134,13 +140,20 @@ class TypedElementBuilder {
            // A complex data definition should recurse.
            $element[$name] = $this->getElementsForDefinition($definition);
         }
-        elseif ($definition instanceof ListDataDefinitionInterface) {
+        elseif ($definition->isList()) {
           // Get the list of elements.
           $element[$name] = $this->getElementsForListDefinition($definition);
         }
         else {
-          // Get a single element by its parent definition's property name.
-          $element[$name] = $this->getElementForDefinition($parent_definition, $name);
+          // Get the element for the definition.
+          $element_type = PrimitiveElementBuilder::getType($definition);
+          $element = [
+            '#type' => $element_type,
+            '#title' => $definition->getLabel(),
+            '#description' => $definition->getDescription() ? $definition->getDescription() : '',
+          ];
+          $element += PrimitiveElementBuilder::getProperties($element_type, $definition);
+          $element += $this->getAdditionalProperties($element_type, $definition);
         }
       }
     }
@@ -149,38 +162,36 @@ class TypedElementBuilder {
   }
 
   /**
-   * Get the form element for a specific property of a data definition.
+   * Get the form element for a data definition.
    *
-   * @param \Drupal\Core\TypedData\ComplexDataDefinitionBase $parent_definition
+   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
    *   The complex data definition.
-   * @param string $name
-   *   The property name to get the element for.
    * @return array The form element.
    *   The form element.
-   *
-   * @throws \InvalidArgumentException
    */
-  public function getElementForDefinition(ComplexDataDefinitionBase $parent_definition, $name) {
+  public function getElementForDefinition(DataDefinitionInterface $definition) {
     $element = [];
 
-    $definition = $parent_definition->getPropertyDefinition($name);
-
-    if (!isset($definition)) {
-      throw new \InvalidArgumentException('Property not found.');
+    if ($definition->isComputed() || $definition->isReadOnly()) {
+      return $element;
     }
 
     if (is_subclass_of($definition, '\Drupal\Core\TypedData\ComplexDataDefinitionBase')) {
       $element = $this->getElementsForDefinition($definition);
     }
-    elseif ($definition instanceof ListDataDefinition) {
+    elseif ($definition->isList()) {
       $element = $this->getElementsForListDefinition($definition);
     }
     else {
-      $element['#type'] = $this->getElementTypeFromDefinition($definition);
-      $element['#title'] = $definition->getLabel();
-      $element['#description'] = $definition->getDescription() ? $definition->getDescription() : '';
-
-      $element += $this->getAdditionalProperties($element['#type'], $definition, $parent_definition->getDataType());
+      // Get the element for the definition.
+      $element_type = PrimitiveElementBuilder::getType($definition);
+      $element = [
+        '#type' => $element_type,
+        '#title' => $definition->getLabel(),
+        '#description' => $definition->getDescription() ? $definition->getDescription() : '',
+      ];
+      $element += PrimitiveElementBuilder::getProperties($element_type, $definition);
+      $element += $this->getAdditionalProperties($element_type, $definition);
     }
 
     return $element;
@@ -191,10 +202,12 @@ class TypedElementBuilder {
    *
    * @param \Drupal\Core\TypedData\ListDataDefinitionInterface $list_definition
    *   A list data definition
+   * @param integer $size
+   *   How many child elements to create. Default to 1 element.
    * @return array
    *   The nested form element.
    */
-  public function getElementsForListDefinition(ListDataDefinitionInterface $list_definition) {
+  public function getElementsForListDefinition(ListDataDefinitionInterface $list_definition, $size = 1) {
     $element = [
       '#type' => 'container',
       '#tree' => TRUE,
@@ -204,20 +217,27 @@ class TypedElementBuilder {
 
     $definition = $list_definition->getItemDefinition();
 
-    if (is_subclass_of($definition, '\Drupal\Core\TypedData\ComplexDataDefinitionBase')) {
-      $element[] = $this->getElementsForDefinition($definition);
+    if ($size < 0) {
+      throw new \InvalidArgumentException('Element size must be 0 or greater.');
     }
-    elseif ($definition instanceof ListDataDefinitionInterface) {
-      $element[] = $this->getElementsForListDefinition($definition);
-    }
-    elseif (!$definition->isComputed()) {
-      $element_type = $this->getElementTypeFromDefinition($definition);
-      $element[] = [
-        '#type' => $element_type,
-        '#title' => $definition->getLabel(),
-        '#description' => $definition->getDescription() ? $definition->getDescription() : '',
-      ];
-      $element += $this->getAdditionalProperties($element_type, $definition, $list_definition->getDataType());
+
+    for ($i = 0; $i < $size; $i++) {
+      if (is_subclass_of($definition, '\Drupal\Core\TypedData\ComplexDataDefinitionBase')) {
+        $element[] = $this->getElementsForDefinition($definition);
+      }
+      elseif ($definition->isList()) {
+        $element[] = $this->getElementsForListDefinition($definition);
+      }
+      elseif (!$definition->isComputed()) {
+        $element_type = PrimitiveElementBuilder::getType($definition);
+        $element[] = [
+          '#type' => $element_type,
+          '#title' => $definition->getLabel(),
+          '#description' => $definition->getDescription() ? $definition->getDescription() : '',
+        ]
+          + PrimitiveElementBuilder::getProperties($element_type, $definition)
+          + $this->getAdditionalProperties($element_type, $definition);
+      }
     }
 
     return $element;

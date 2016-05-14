@@ -9,14 +9,31 @@ namespace Drupal\Tests\typed_widget\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\typed_widget\Form\TypedElementBuilder;
 use Prophecy\Argument;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Log\NullLogger;
 
 /**
  * Class TypedElementTestBase
  */
 abstract class TypedElementTestBase extends UnitTestCase {
+
+  /**
+   * Get the element builder class.
+   *
+   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
+   * @return \Drupal\typed_widget\Form\TypedElementBuilder
+   */
+  protected function getElementBuilder(TypedDataManagerInterface $typedDataManager) {
+    return new TypedElementBuilder(
+      $typedDataManager,
+      $this->getLogger(),
+      $this->getModuleHandlerMock()
+    );
+  }
 
   /**
    * Set the container. Required in all child tests.

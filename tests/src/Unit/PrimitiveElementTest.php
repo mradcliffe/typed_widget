@@ -7,8 +7,6 @@
 
 namespace Drupal\Tests\typed_widget\Unit;
 
-
-use Drupal\typed_widget\Form\TypedElementBuilder;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
@@ -36,13 +34,12 @@ class PrimitiveElementTest extends TypedElementTestBase {
     // Set the container
     $this->setContainer($typedDataManager);
 
-    $elementBuilder = new TypedElementBuilder(
-      $typedDataManager,
-      $this->getLogger(),
-      $this->getModuleHandlerMock()
-    );
-
+    $elementBuilder = $this->getElementBuilder($typedDataManager);
     $element = $elementBuilder->getElementFor('boolean');
+    $this->assertEquals($expected, $element);
+    
+    // Assert use of ::getElementForDefinition.
+    $element = $elementBuilder->getElementForDefinition($booleanDefinition);
     $this->assertEquals($expected, $element);
   }
 
@@ -68,11 +65,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
     // Set the container
     $this->setContainer($typedDataManager);
 
-    $elementBuilder = new TypedElementBuilder(
-      $typedDataManager,
-      $this->getLogger(),
-      $this->getModuleHandlerMock()
-    );
+    $elementBuilder = $this->getElementBuilder($typedDataManager);
 
     $element = $elementBuilder->getElementFor('string');
     $this->assertEquals($expected, $element);
@@ -104,11 +97,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
     // Set the container
     $this->setContainer($typedDataManager);
 
-    $elementBuilder = new TypedElementBuilder(
-      $typedDataManager,
-      $this->getLogger(),
-      $this->getModuleHandlerMock()
-    );
+    $elementBuilder = $this->getElementBuilder($typedDataManager);
 
     $element = $elementBuilder->getElementFor('integer');
     $this->assertEquals($expected, $element);
@@ -140,11 +129,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
     // Set the container
     $this->setContainer($typedDataManager);
 
-    $elementBuilder = new TypedElementBuilder(
-      $typedDataManager,
-      $this->getLogger(),
-      $this->getModuleHandlerMock()
-    );
+    $elementBuilder = $this->getElementBuilder($typedDataManager);
 
     $element = $elementBuilder->getElementFor('float');
     $this->assertEquals($expected, $element);
@@ -170,11 +155,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
     // Set the container
     $this->setContainer($typedDataManager);
 
-    $elementBuilder = new TypedElementBuilder(
-      $typedDataManager,
-      $this->getLogger(),
-      $this->getModuleHandlerMock()
-    );
+    $elementBuilder = $this->getElementBuilder($typedDataManager);
 
     $element = $elementBuilder->getElementFor('timestamp');
     $this->assertEquals($expected, $element);
@@ -200,11 +181,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
     // Set the container
     $this->setContainer($typedDataManager);
 
-    $elementBuilder = new TypedElementBuilder(
-      $typedDataManager,
-      $this->getLogger(),
-      $this->getModuleHandlerMock()
-    );
+    $elementBuilder = $this->getElementBuilder($typedDataManager);
 
     $element = $elementBuilder->getElementFor('datetime_iso8601');
     $this->assertEquals($expected, $element);
@@ -233,11 +210,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
     // Set the container
     $this->setContainer($typedDataManager);
 
-    $elementBuilder = new TypedElementBuilder(
-      $typedDataManager,
-      $this->getLogger(),
-      $this->getModuleHandlerMock()
-    );
+    $elementBuilder = $this->getElementBuilder($typedDataManager);
 
     $element = $elementBuilder->getElementFor('timespan');
     $this->assertEquals($expected, $element);
@@ -263,11 +236,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
     // Set the container
     $this->setContainer($typedDataManager);
 
-    $elementBuilder = new TypedElementBuilder(
-      $typedDataManager,
-      $this->getLogger(),
-      $this->getModuleHandlerMock()
-    );
+    $elementBuilder = $this->getElementBuilder($typedDataManager);
 
     $element = $elementBuilder->getElementFor('duration_iso8601');
     $this->assertEquals($expected, $element);
@@ -296,11 +265,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
     // Set the container
     $this->setContainer($typedDataManager);
 
-    $elementBuilder = new TypedElementBuilder(
-      $typedDataManager,
-      $this->getLogger(),
-      $this->getModuleHandlerMock()
-    );
+    $elementBuilder = $this->getElementBuilder($typedDataManager);
 
     $element = $elementBuilder->getElementFor('string');
     $this->assertEquals($expected, $element);
