@@ -26,8 +26,6 @@ class ComplexElementTest extends TypedElementTestBase {
     $expected = [
       '#type' => 'container',
       '#tree' => TRUE,
-      '#title' => 'Map',
-      '#description' => '',
       'text' => [
         '#type' => 'textfield',
         '#title' => 'Text',
