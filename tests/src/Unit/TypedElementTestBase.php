@@ -7,8 +7,10 @@
 
 namespace Drupal\Tests\typed_widget\Unit;
 
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\TypedData\ListDataDefinitionInterface;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpKernel\Log\NullLogger;
@@ -63,12 +65,31 @@ abstract class TypedElementTestBase extends UnitTestCase {
    */
   protected function getTypedDataMock(DataDefinitionInterface $definition, array $constraints = []) {
     $typedDataProphecy = $this->prophesize('\Drupal\Core\TypedData\TypedDataManagerInterface');
+    $typedDataProphecy->createDataDefinition($definition->getDataType())->willReturn($definition);
     $typedDataProphecy->getDefaultConstraints($definition)->willReturn($constraints);
-    $typedDataProphecy
-      ->createDataDefinition($definition->getDataType())
-      ->willReturn($definition);
     $typedDataProphecy->getDefinition($definition->getDataType())->willReturn($definition);
     $typedDataProphecy->getDefinitions()->willReturn([$definition->getDataType() => $definition]);
+
+    if ($definition instanceof ComplexDataDefinitionInterface) {
+      /** $definition \Drupal\Core\TypedData\ComplexDataDefinitionInterface $definition */
+      foreach ($definition->getPropertyDefinitions() as $name => $child_definition) {
+        $typedDataProphecy->createDataDefinition($child_definition->getDataType())
+          ->willReturn($child_definition);
+        $typedDataProphecy->getDefaultConstraints($child_definition)
+          ->willReturn([]);
+        $typedDataProphecy->getDefinition($child_definition->getDataType())
+          ->willReturn($child_definition);
+      }
+    }
+    elseif ($definition instanceof ListDataDefinitionInterface) {
+      $typedDataProphecy->createDataDefinition('string')
+        ->willReturn($definition->getItemDefinition());
+      $typedDataProphecy->getDefaultConstraints($definition->getItemDefinition())
+        ->willReturn([]);
+      $typedDataProphecy->getDefinition('string')
+        ->willReturn($definition->getItemDefinition());
+    }
+
     return $typedDataProphecy->reveal();
   }
 }
