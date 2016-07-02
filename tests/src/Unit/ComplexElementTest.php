@@ -29,18 +29,29 @@ class ComplexElementTest extends TypedElementTestBase {
         '#title' => 'Text',
         '#description' => '',
       ],
+      'number' => [
+        '#type' => 'number',
+        '#title' => 'Number',
+        '#description' => '',
+      ]
     ];
     
     $stringDefinition = DataDefinition::create('string');
     $stringDefinition
       ->setClass('\Drupal\Core\TypedData\Plugin\DataType\StringData')
       ->setLabel('Text');
+
+    $intDefinition = DataDefinition::create('number');
+    $intDefinition
+      ->setClass('\Drupal\Core\TypedData\Plugin\DataType\IntegerData')
+      ->setLabel('Number');
     
     $mapDefinition = MapDataDefinition::create('map');
     $mapDefinition
       ->setClass('\Drupal\Core\TypedData\Plugin\DataType\Map')
       ->setLabel('Map')
-      ->setPropertyDefinition('text', $stringDefinition);
+      ->setPropertyDefinition('text', $stringDefinition)
+      ->setPropertyDefinition('number', $intDefinition);
 
     $typedDataManager = $this->getTypedDataMock($mapDefinition);
 
