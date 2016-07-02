@@ -19,8 +19,6 @@ class ComplexElementTest extends TypedElementTestBase {
 
   /**
    * Test a map data type with a primitive data type as a child.
-   *
-   * @covers \Drupal\typed_widget\TypedElementBuilder::getComplexElement
    */
   public function testGetComplexElement() {
     $expected = [
@@ -51,6 +49,7 @@ class ComplexElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );

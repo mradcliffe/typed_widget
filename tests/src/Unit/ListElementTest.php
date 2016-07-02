@@ -19,8 +19,6 @@ class ListElementTest extends TypedElementTestBase {
 
   /**
    * Test a list of strings.
-   *
-   * @covers \Drupal\typed_widget\TypedElementBuilder::getListElement
    */
   public function testGetListElement() {
     $expected = [
@@ -44,6 +42,7 @@ class ListElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),    
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );

@@ -6,17 +6,17 @@
 
 namespace Drupal\typed_widget\Form;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
+use Drupal\Core\Form\FormState;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\TypedData\ComplexDataDefinitionBase;
 use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
-use Drupal\Core\TypedData\ListDataDefinition;
 use Drupal\Core\TypedData\ListDataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 
@@ -39,6 +39,11 @@ class TypedElementBuilder {
   protected $typedDataManager;
 
   /**
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * @var \Drupal\Core\Logger\LoggerInterface
    */
   protected $logger;
@@ -58,8 +63,9 @@ class TypedElementBuilder {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface
    *   The module handler service.
    */
-  public function __construct(TypedDataManagerInterface $typedDataManager, LoggerChannelFactoryInterface $loggerFactory, ModuleHandlerInterface $moduleHandler) {
+  public function __construct(TypedDataManagerInterface $typedDataManager, EntityTypeManagerInterface $entityTypeManager, LoggerChannelFactoryInterface $loggerFactory, ModuleHandlerInterface $moduleHandler) {
     $this->typedDataManager = $typedDataManager;
+    $this->entityTypeManager = $entityTypeManager;
     $this->logger = $loggerFactory->get('typed_widget');
     $this->moduleHandler = $moduleHandler;
   }
@@ -224,14 +230,19 @@ class TypedElementBuilder {
    */
   function getEntityElement(EntityDataDefinition $entity_definition, $property_name = '') {
 
-    $element = $this->getParentContainer($entity_definition);
+    $entity_type = $entity_definition->getEntityTypeId();
+    $form_state = new FormState();
 
-    /** @var \Drupal\Core\Field\BaseFieldDefinition $definition */
-    foreach ($entity_definition->getPropertyDefinitions() as $name => $definition) {
-      if (!$definition->isComputed() && !$definition->isReadOnly()) {
-        $method = $this->getMethod($definition);
-        $element[$name] = $this->{$method}($definition);
-      }
+    $form = $this->entityTypeManager->getFormObject($entity_type, 'default');
+
+    $form->setEntity($this->entityTypeManager->getStorage($entity_type)->create([]));
+    $element = $form->buildForm([], $form_state);
+
+    // Remove actions
+    unset($element['actions']);
+
+    if ($property_name) {
+      return isset($element[$property_name]) ? $element[$property_name] : [];
     }
 
     return $element;

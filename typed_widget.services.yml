@@ -1,4 +1,4 @@
 services:
   typed_widget.element_builder:
     class: \Drupal\typed_widget\Form\TypedElementBuilder
-    arguments: ['@typed_data_manager', '@logger.factory', '@module_handler']
+    arguments: ['@typed_data_manager', '@entity_type.manager', '@logger.factory', '@module_handler']

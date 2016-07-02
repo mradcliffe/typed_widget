@@ -38,6 +38,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );
@@ -70,6 +71,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );
@@ -106,6 +108,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );
@@ -142,6 +145,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );
@@ -172,6 +176,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );
@@ -202,6 +207,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );
@@ -235,6 +241,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );
@@ -265,6 +272,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );
@@ -298,6 +306,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );

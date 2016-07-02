@@ -30,11 +30,20 @@ abstract class TypedElementTestBase extends UnitTestCase {
     $container->set('logger_factory', $this->getLogger());
     $container->set('module_handler', $this->getModuleHandlerMock());
     $container->set('typed_data_manager', $typedDataManager);
+    $container->set('entity_type.manager', $this->getEntityTypeManagerMock());
     \Drupal::setContainer($container);
   }
 
   /**
-   * @return \Drupal\Core\Logger\LoggerChannelFactoryInterface;
+   * @return \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected function getEntityTypeManagerMock() {
+    $prophecy = $this->prophesize('\Drupal\Core\Entity\EntityTypeManagerInterface');
+    return $prophecy->reveal();
+  }
+
+  /**
+   * @return \Drupal\Core\Logger\LoggerChannelFactoryInterface
    */
   protected function getLogger() {
     $loggerProphecy = $this->prophesize('\Drupal\Core\Logger\LoggerChannelFactoryInterface');
