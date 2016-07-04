@@ -268,8 +268,21 @@ class TypedElementBuilder {
    */
   public function getBaseFieldElement(BaseFieldDefinition $definition) {
     $element = $this->getParentContainer($definition, 'fieldgroup');
+    $settings = $definition->getSettings();
+
+    // Detect entity reference fields and do something about it.
+    if (isset($settings['target_type'])) {
+      $element[0] = [
+        '#type' => 'entity_autocomplete',
+        '#title' => $definition->getLabel(),
+        '#target_type' => $settings['target_type'],
+      ];
+      return $element;
+    }
+
     $method = $this->getMethod($definition->getItemDefinition());
     $element[0] = $this->{$method}($definition->getItemDefinition());
+
     return $element;
   }
 
