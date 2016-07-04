@@ -1,22 +1,17 @@
 <?php
 
-/**
- * @file
- * Contains TypedElementTestBase
- */
-
 namespace Drupal\Tests\typed_widget\Unit;
 
 use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\ListDataDefinitionInterface;
+use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Tests\UnitTestCase;
-use Prophecy\Argument;
 use Symfony\Component\HttpKernel\Log\NullLogger;
 
 /**
- * Class TypedElementTestBase
+ * Base test class for testing typed element builder.
  */
 abstract class TypedElementTestBase extends UnitTestCase {
 
@@ -24,8 +19,9 @@ abstract class TypedElementTestBase extends UnitTestCase {
    * Set the container. Required in all child tests.
    *
    * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
+   *   Set the Drupal container with some useful services.
    */
-  protected function setContainer($typedDataManager) {
+  protected function setContainer(TypedDataManagerInterface $typedDataManager) {
     $container = new ContainerBuilder();
     $container->set('logger_factory', $this->getLogger());
     $container->set('module_handler', $this->getModuleHandlerMock());
@@ -35,7 +31,10 @@ abstract class TypedElementTestBase extends UnitTestCase {
   }
 
   /**
+   * Get a dummy entity type manager mock.
+   *
    * @return \Drupal\Core\Entity\EntityTypeManagerInterface
+   *   The entity type manager service.
    */
   protected function getEntityTypeManagerMock() {
     $prophecy = $this->prophesize('\Drupal\Core\Entity\EntityTypeManagerInterface');
@@ -43,7 +42,10 @@ abstract class TypedElementTestBase extends UnitTestCase {
   }
 
   /**
+   * Get a dummy logger channel mock.
+   *
    * @return \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   *   The logger channel object.
    */
   protected function getLogger() {
     $loggerProphecy = $this->prophesize('\Drupal\Core\Logger\LoggerChannelFactoryInterface');
@@ -52,7 +54,10 @@ abstract class TypedElementTestBase extends UnitTestCase {
   }
 
   /**
+   * Get a dummy module handler mock.
+   *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The module_handler service.
    */
   protected function getModuleHandlerMock() {
     $handlerProphecy = $this->prophesize('\Drupal\Core\Extension\ModuleHandlerInterface');
@@ -69,6 +74,7 @@ abstract class TypedElementTestBase extends UnitTestCase {
    *   The definition to create.
    * @param array $constraints
    *   An array of constraint definitions keyed by constraint name.
+   *
    * @return \Drupal\Core\TypedData\TypedDataManagerInterface
    *   Typed Data Manager.
    */
@@ -80,7 +86,7 @@ abstract class TypedElementTestBase extends UnitTestCase {
     $typedDataProphecy->getDefinitions()->willReturn([$definition->getDataType() => $definition]);
 
     if ($definition instanceof ComplexDataDefinitionInterface) {
-      /** $definition \Drupal\Core\TypedData\ComplexDataDefinitionInterface $definition */
+      /* $definition \Drupal\Core\TypedData\ComplexDataDefinitionInterface $definition */
       foreach ($definition->getPropertyDefinitions() as $name => $child_definition) {
         $typedDataProphecy->createDataDefinition($child_definition->getDataType())
           ->willReturn($child_definition);
@@ -101,4 +107,5 @@ abstract class TypedElementTestBase extends UnitTestCase {
 
     return $typedDataProphecy->reveal();
   }
+
 }

@@ -1,10 +1,5 @@
 <?php
 
-/*
- * @file
- * Contains PrimitiveElementBuilder
- */
-
 namespace Drupal\typed_widget\Form;
 
 use Drupal\Core\TypedData\DataDefinitionInterface;
@@ -72,4 +67,5 @@ class PrimitiveElementBuilder implements ElementBuilderInterface {
 
     return $properties;
   }
+
 }

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- *
- */
-
 namespace Drupal\Tests\typed_widget\Unit;
 
 use Drupal\Core\TypedData\ListDataDefinition;
@@ -12,7 +7,8 @@ use Drupal\typed_widget\Form\TypedElementBuilder;
 use Drupal\Core\TypedData\DataDefinition;
 
 /**
- * 
+ * Assert that a list item is rendered into a form element.
+ *
  * @group typed_widget
  */
 class ListElementTest extends TypedElementTestBase {
@@ -26,7 +22,7 @@ class ListElementTest extends TypedElementTestBase {
         '#type' => 'textfield',
         '#title' => 'Text',
         '#description' => '',
-      ]
+      ],
     ];
 
     $stringDefinition = DataDefinition::create('string');
@@ -42,7 +38,7 @@ class ListElementTest extends TypedElementTestBase {
 
     $elementBuilder = new TypedElementBuilder(
       $typedDataManager,
-      $this->getEntityTypeManagerMock(),    
+      $this->getEntityTypeManagerMock(),
       $this->getLogger(),
       $this->getModuleHandlerMock()
     );
@@ -50,4 +46,5 @@ class ListElementTest extends TypedElementTestBase {
     $element = $elementBuilder->getElementFor('list');
     $this->assertEquals($expected, $element);
   }
+
 }

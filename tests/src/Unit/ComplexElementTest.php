@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- *
- */
-
 namespace Drupal\Tests\typed_widget\Unit;
 
 use Drupal\Core\TypedData\DataDefinition;
@@ -12,7 +7,8 @@ use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\typed_widget\Form\TypedElementBuilder;
 
 /**
- * 
+ * Assert that complex data types are rendered correctly.
+ *
  * @group typed_widget
  */
 class ComplexElementTest extends TypedElementTestBase {
@@ -33,9 +29,9 @@ class ComplexElementTest extends TypedElementTestBase {
         '#type' => 'number',
         '#title' => 'Number',
         '#description' => '',
-      ]
+      ],
     ];
-    
+
     $stringDefinition = DataDefinition::create('string');
     $stringDefinition
       ->setClass('\Drupal\Core\TypedData\Plugin\DataType\StringData')
@@ -45,7 +41,7 @@ class ComplexElementTest extends TypedElementTestBase {
     $intDefinition
       ->setClass('\Drupal\Core\TypedData\Plugin\DataType\IntegerData')
       ->setLabel('Number');
-    
+
     $mapDefinition = MapDataDefinition::create('map');
     $mapDefinition
       ->setClass('\Drupal\Core\TypedData\Plugin\DataType\Map')
@@ -69,4 +65,5 @@ class ComplexElementTest extends TypedElementTestBase {
     $this->assertEquals($expected, $element);
     $this->assertEquals($expected['text'], $elementBuilder->getElementFor('map', 'text'));
   }
+
 }

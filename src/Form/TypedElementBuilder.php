@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\typed_widget\Form\TypedElementBuilder.
- */
 
 namespace Drupal\typed_widget\Form;
 
@@ -16,17 +12,16 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-use Drupal\Core\TypedData\ComplexDataDefinitionBase;
 use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\ListDataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 
 /**
- * The typed_widget.builder service provides methods to create form elements
- * from Typed Data data types defined in Drupal.
+ * The typed_widget.builder service creates form elements from data types.
  *
  * Example usage:
+ *
  * @code
  * // Get form element required for a primitive data type.
  * $formBuilder = \Drupal::service('typed_widget.element_builder');
@@ -51,22 +46,34 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
 class TypedElementBuilder {
 
   /**
+   * Typed Data Manager.
+   *
    * @var \Drupal\Core\TypedData\TypedDataManagerInterface
+   *   The typed data manager.
    */
   protected $typedDataManager;
 
   /**
+   * Entity Type Manager.
+   *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   *   The entity type manager.
    */
   protected $entityTypeManager;
 
   /**
-   * @var \Drupal\Core\Logger\LoggerInterface
+   * Logger Channel for Typed Widget.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   *   The logger channel object.
    */
   protected $logger;
 
   /**
+   * Module handler.
+   *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   *   The module handler.
    */
   protected $moduleHandler;
 
@@ -77,9 +84,9 @@ class TypedElementBuilder {
    *   The typed data manager service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory
    *   The logger channel factory service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler service.
    */
   public function __construct(TypedDataManagerInterface $typedDataManager, EntityTypeManagerInterface $entityTypeManager, LoggerChannelFactoryInterface $loggerFactory, ModuleHandlerInterface $moduleHandler) {
@@ -90,10 +97,13 @@ class TypedElementBuilder {
   }
 
   /**
-   * Get the method on this class for the appropriate typed data element builder
+   * Get the method for the appropriate typed data element builder.
    *
    * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   *   The Typed Data definition.
+   *
    * @return string
+   *   A method name.
    *
    * @todo figure out approach to make this extendable.
    */
@@ -101,16 +111,16 @@ class TypedElementBuilder {
     if ($definition instanceof EntityDataDefinition) {
       return 'getEntityElement';
     }
-    else if (is_subclass_of($definition, '\Drupal\Core\TypedData\ComplexDataDefinitionBase')) {
+    elseif (is_subclass_of($definition, '\Drupal\Core\TypedData\ComplexDataDefinitionBase')) {
       return 'getComplexElement';
     }
-    else if ($definition instanceof BaseFieldDefinition) {
+    elseif ($definition instanceof BaseFieldDefinition) {
       return 'getBaseFieldElement';
     }
-    else if ($definition instanceof FieldItemDataDefinition) {
+    elseif ($definition instanceof FieldItemDataDefinition) {
       return 'getFieldElement';
     }
-    else if ($definition instanceof ListDataDefinitionInterface) {
+    elseif ($definition instanceof ListDataDefinitionInterface) {
       return 'getListElement';
     }
     else {
@@ -125,18 +135,20 @@ class TypedElementBuilder {
    *   The data type plugin id.
    * @param string $property_name
    *   (Optional) A property name of the data type to return.
-   * @param array $values
-   *   (Optional) Values TODO
+   * @param array $options
+   *   (Optional) Values TODO.
+   *
    * @return array
    *   A render array.
+   *
    * @throws PluginNotFoundException
    */
-  public function getElementFor($plugin_id, $property_name = '', $values = []) {
+  public function getElementFor($plugin_id, $property_name = '', $options = []) {
     try {
       $definition = $this->typedDataManager->createDataDefinition($plugin_id);
 
       $method = $this->getMethod($definition);
-      $element = $this->{$method}($definition, $property_name, $values);
+      $element = $this->{$method}($definition, $property_name, $options);
     }
     catch (PluginNotFoundException $e) {
       throw $e;
@@ -148,13 +160,12 @@ class TypedElementBuilder {
    * Get a single element from a data definition for a primitive type.
    *
    * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
-   * @param string $property_name
-   *   Not used.
-   * @param $values
-   *   (Optional) values TODO
+   *   The typed data definition.
+   *
    * @return array
+   *   A form element.
    */
-  public function getPrimitiveElement(DataDefinitionInterface $definition, $property_name = '', $values = []) {
+  public function getPrimitiveElement(DataDefinitionInterface $definition) {
     // Get the element for the definition.
     $element_type = PrimitiveElementBuilder::getType($definition);
     $element = [
@@ -174,11 +185,11 @@ class TypedElementBuilder {
    *   The complex data definition to render.
    * @param string $property_name
    *   (Optional) The property name to fetch from the complex data type.
-   * @param $values
-   *   (Optional) values TODO
+   *
    * @return array
+   *   A form element.
    */
-  public function getComplexElement(ComplexDataDefinitionInterface $parent_definition, $property_name = '', $values = []) {
+  public function getComplexElement(ComplexDataDefinitionInterface $parent_definition, $property_name = '') {
     if ($property_name) {
       /** @var \Drupal\Core\TypedData\DataDefinitionInterface $definition */
       $definition = $parent_definition->getPropertyDefinition($property_name);
@@ -209,14 +220,17 @@ class TypedElementBuilder {
    * Get an element for a field definition.
    *
    * @param \Drupal\Core\Field\TypedData\FieldItemDataDefinition $field_definition
+   *   The field item data definition.
    * @param string $property_name
-   * @param array $values
+   *   (Optional) A property name to restrict the form element return value.
+   *
    * @return array
+   *   A form element.
    *
    * @todo write a unit test for this but this requires a test field item that
    *   does not suck because all of the field items depend on \t(). FML.
    */
-  public function getFieldElement(FieldItemDataDefinition $field_definition, $property_name = '', $values = []) {
+  public function getFieldElement(FieldItemDataDefinition $field_definition, $property_name = '') {
     if ($property_name) {
       /** @var \Drupal\Core\TypedData\DataDefinitionInterface $definition */
       $definition = $field_definition->getPropertyDefinition($property_name);
@@ -244,12 +258,15 @@ class TypedElementBuilder {
   }
 
   /**
+   * Get a form elemetn for a base field definition.
+   *
    * @param \Drupal\Core\Field\BaseFieldDefinition $definition
-   * @param string $property_name
-   * @param array $values
+   *   The base field definition.
+   *
    * @return array
+   *   A form element.
    */
-  public function getBaseFieldElement(BaseFieldDefinition $definition, $property_name = '', $values = []) {
+  public function getBaseFieldElement(BaseFieldDefinition $definition) {
     $element = $this->getParentContainer($definition, 'fieldgroup');
     $method = $this->getMethod($definition->getItemDefinition());
     $element[0] = $this->{$method}($definition->getItemDefinition());
@@ -260,14 +277,16 @@ class TypedElementBuilder {
    * Get an element for an entity type.
    *
    * @param \Drupal\Core\Entity\TypedData\EntityDataDefinition $entity_definition
-   *   The entity data definition
-   * @param $property_name
-   *   (Optional) an optional property name to restrict to
-   * @param $values
-   *   (Optional) values TODO
+   *   The entity data definition.
+   * @param string $property_name
+   *   (Optional) an optional property name to restrict to.
+   * @param array $options
+   *   (Optional) values TODO.
+   *
    * @return array
+   *   A form element.
    */
-  public function getEntityElement(EntityDataDefinition $entity_definition, $property_name = '', $values = []) {
+  public function getEntityElement(EntityDataDefinition $entity_definition, $property_name = '', $options = []) {
 
     // Return the element corresponding to the property name before building an
     // entire entity form.
@@ -285,10 +304,10 @@ class TypedElementBuilder {
 
     try {
       $form = $this->entityTypeManager->getFormObject($entity_type, 'default');
-      $form->setEntity($this->entityTypeManager->getStorage($entity_type)->create($values));
+      $form->setEntity($this->entityTypeManager->getStorage($entity_type)->create($options));
       $element = $form->buildForm([], $form_state);
 
-      // Remove actions
+      // Remove actions.
       unset($element['actions']);
     }
     catch (InvalidPluginDefinitionException $e) {
@@ -306,8 +325,12 @@ class TypedElementBuilder {
    * Get an element container for a complex data definition.
    *
    * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   *   The data definition to generate a parent element for.
    * @param string $type
+   *   The type of parent element to use such as fieldset or container.
+   *
    * @return array
+   *   A form element.
    */
   protected function getParentContainer(DataDefinitionInterface $definition, $type = 'container') {
     $element = [
@@ -326,13 +349,14 @@ class TypedElementBuilder {
    * Get an element container for a list of items.
    *
    * @param \Drupal\Core\TypedData\ListDataDefinitionInterface $definition
-   * @param string $property_name
-   * @param array $values
+   *   The list data definition.
+   *
    * @return array
+   *   A form elemnet.
    *
    * @todo implement an add_more functionality.
    */
-  public function getListElement(ListDataDefinitionInterface $definition, $property_name = '', $values = []) {
+  public function getListElement(ListDataDefinitionInterface $definition) {
     $element = [];
 
     $property_definition = $definition->getItemDefinition();
@@ -343,15 +367,15 @@ class TypedElementBuilder {
   }
 
   /**
-   * Get any additional form properties to merge into the element for a given
-   * form element type.
+   * Get any additional form properties to merge into the element.
    *
    * @param string $type
    *   The form element type property.
    * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
-   *   The data definition
+   *   The data definition.
    * @param string $parent_type
    *   (Optional) The parent data type.
+   *
    * @return array
    *   An array of properties to merge into the form element.
    */
@@ -368,4 +392,5 @@ class TypedElementBuilder {
 
     return $properties;
   }
+
 }

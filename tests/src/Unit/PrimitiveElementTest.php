@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains PrimitiveElementTest
- */
-
 namespace Drupal\Tests\typed_widget\Unit;
 
 
@@ -33,7 +28,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
     $booleanDefinition->setClass('\Drupal\Core\TypedData\Plugin\DataType\BooleanData');
     $typedDataManager = $this->getTypedDataMock($booleanDefinition);
 
-    // Set the container
+    // Set the container.
     $this->setContainer($typedDataManager);
 
     $elementBuilder = new TypedElementBuilder(
@@ -66,7 +61,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
       ->setRequired(TRUE);
     $typedDataManager = $this->getTypedDataMock($stringDefinition);
 
-    // Set the container
+    // Set the container.
     $this->setContainer($typedDataManager);
 
     $elementBuilder = new TypedElementBuilder(
@@ -89,7 +84,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
       '#title' => $this->getRandomGenerator()->name(),
       '#description' => '',
       '#min' => 0,
-      '#max' => 10
+      '#max' => 10,
     ];
 
     $integerDefinition = DataDefinition::create('integer');
@@ -99,11 +94,11 @@ class PrimitiveElementTest extends TypedElementTestBase {
       ->setDescription($expected['#description'])
       ->addConstraint('Range', ['min' => 0, 'max' => 10]);
     $constraints = [
-      'Range' => ['min' => 0, 'max' => 10]
+      'Range' => ['min' => 0, 'max' => 10],
     ];
     $typedDataManager = $this->getTypedDataMock($integerDefinition, $constraints);
 
-    // Set the container
+    // Set the container.
     $this->setContainer($typedDataManager);
 
     $elementBuilder = new TypedElementBuilder(
@@ -118,7 +113,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
   }
 
   /**
-   * Assert that number element is used for float
+   * Assert that number element is used for float.
    */
   public function testFloat() {
     $expected = [
@@ -126,7 +121,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
       '#title' => $this->getRandomGenerator()->name(),
       '#description' => '',
       '#min' => 0,
-      '#max' => 10
+      '#max' => 10,
     ];
 
     $floatDefinition = DataDefinition::create('float');
@@ -136,11 +131,11 @@ class PrimitiveElementTest extends TypedElementTestBase {
       ->setDescription($expected['#description'])
       ->addConstraint('Range', ['min' => 0, 'max' => 10]);
     $constraints = [
-      'Range' => ['min' => 0, 'max' => 10]
+      'Range' => ['min' => 0, 'max' => 10],
     ];
     $typedDataManager = $this->getTypedDataMock($floatDefinition, $constraints);
 
-    // Set the container
+    // Set the container.
     $this->setContainer($typedDataManager);
 
     $elementBuilder = new TypedElementBuilder(
@@ -171,7 +166,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
       ->setDescription($expected['#description']);
     $typedDataManager = $this->getTypedDataMock($timeDefinition);
 
-    // Set the container
+    // Set the container.
     $this->setContainer($typedDataManager);
 
     $elementBuilder = new TypedElementBuilder(
@@ -188,7 +183,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
   /**
    * Assert that datetime element is returned for datetimeiso8601.
    */
-  public function testDatetimeISO8601() {
+  public function testDatetimeIso8601() {
     $expected = [
       '#type' => 'datetime',
       '#title' => $this->getRandomGenerator()->name(),
@@ -202,7 +197,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
       ->setDescription($expected['#description']);
     $typedDataManager = $this->getTypedDataMock($timeDefinition);
 
-    // Set the container
+    // Set the container.
     $this->setContainer($typedDataManager);
 
     $elementBuilder = new TypedElementBuilder(
@@ -217,8 +212,9 @@ class PrimitiveElementTest extends TypedElementTestBase {
   }
 
   /**
-   * Assert that a number element with min and max are set appropriately for a
-   * timespan data type.
+   * Assert that a number element is set appropriately for a timespan data type.
+   *
+   * The number element should have min and max values set.
    */
   public function testTimespan() {
     $expected = [
@@ -226,7 +222,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
       '#title' => $this->getRandomGenerator()->name(),
       '#description' => '',
       '#min' => 0,
-      '#max' => 86400
+      '#max' => 86400,
     ];
 
     $durationDefinition = DataDefinition::create('timespan');
@@ -236,7 +232,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
       ->setDescription($expected['#description']);
     $typedDataManager = $this->getTypedDataMock($durationDefinition);
 
-    // Set the container
+    // Set the container.
     $this->setContainer($typedDataManager);
 
     $elementBuilder = new TypedElementBuilder(
@@ -267,7 +263,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
       ->setDescription($expected['#description']);
     $typedDataManager = $this->getTypedDataMock($stringDefinition);
 
-    // Set the container
+    // Set the container.
     $this->setContainer($typedDataManager);
 
     $elementBuilder = new TypedElementBuilder(
@@ -282,8 +278,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
   }
 
   /**
-   * Assert that a select element is returned for a data type that has
-   * AllowedValues constraint.
+   * Assert that a select element has the AllowedValues constraint.
    */
   public function testAllowedValues() {
     $expected = [
@@ -301,7 +296,7 @@ class PrimitiveElementTest extends TypedElementTestBase {
       ->addConstraint('Choice', ['choices' => $expected['#options']]);
     $typedDataManager = $this->getTypedDataMock($stringDefinition, ['Choice' => ['choices' => $expected['#options']]]);
 
-    // Set the container
+    // Set the container.
     $this->setContainer($typedDataManager);
 
     $elementBuilder = new TypedElementBuilder(
@@ -314,4 +309,5 @@ class PrimitiveElementTest extends TypedElementTestBase {
     $element = $elementBuilder->getElementFor('string');
     $this->assertEquals($expected, $element);
   }
+
 }
