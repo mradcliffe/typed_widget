@@ -15,6 +15,7 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\ListDataDefinitionInterface;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 
 /**
@@ -157,11 +158,31 @@ class TypedElementBuilder {
   }
 
   /**
+   * Create a render element for the given data type.
+   *
+   * @param \Drupal\Core\TypedData\TypedDataInterface $data
+   *   The typed data to generate a render element for.
+   * @return array
+   *   A render element.
+   */
+  public function getElementForData(TypedDataInterface $data) {
+    try {
+      $definition = $data->getDataDefinition();
+      $method = $this->getMethod($definition);
+
+      $element = $this->{$method}($definition);
+    }
+    catch (PluginNotFoundException $e) {
+      throw $e;
+    }
+    return $element;
+  }
+
+  /**
    * Get a single element from a data definition for a primitive type.
    *
    * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
    *   The typed data definition.
-   *
    * @return array
    *   A form element.
    */
@@ -173,6 +194,7 @@ class TypedElementBuilder {
       '#title' => $definition->getLabel(),
       '#description' => $definition->getDescription() ? $definition->getDescription() : '',
     ];
+
     $element += PrimitiveElementBuilder::getProperties($element_type, $definition);
     $element += $this->getAdditionalProperties($element_type, $definition);
     return $element;
