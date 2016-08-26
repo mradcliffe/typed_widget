@@ -79,6 +79,20 @@ class TypedElementBuilder {
   protected $moduleHandler;
 
   /**
+   * Toggle display non-required properties.
+   *
+   * @var bool
+   */
+  protected $nonRequiredProperties;
+
+  /**
+   * Toggle display read-only properties.
+   *
+   * @var bool
+   */
+  protected $readOnlyProperties;
+
+  /**
    * Initialize method.
    *
    * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
@@ -95,6 +109,10 @@ class TypedElementBuilder {
     $this->entityTypeManager = $entityTypeManager;
     $this->logger = $loggerFactory->get('typed_widget');
     $this->moduleHandler = $moduleHandler;
+
+    // Display non-required by default, but hide read-only properties.
+    $this->nonRequiredProperties = TRUE;
+    $this->readOnlyProperties = FALSE;
   }
 
   /**
@@ -229,7 +247,7 @@ class TypedElementBuilder {
 
     /** @var \Drupal\Core\TypedData\DataDefinitionInterface $definition */
     foreach ($definitions as $name => $definition) {
-      if (!$definition->isComputed()) {
+      if ($this->shouldDisplay($definition)) {
         $method = $this->getMethod($definition);
         $element[$name] = $this->{$method}($definition);
       }
@@ -270,7 +288,7 @@ class TypedElementBuilder {
 
     /** @var \Drupal\Core\TypedData\DataDefinitionInterface $definition */
     foreach ($definitions as $name => $definition) {
-      if (!$definition->isComputed()) {
+      if ($this->shouldDisplay($definition)) {
         $method = $this->getMethod($definition);
         $element[$name] = $this->{$method}($definition);
       }
@@ -357,6 +375,54 @@ class TypedElementBuilder {
   }
 
   /**
+   * Set the nonRequiredProperties property.
+   *
+   * @param bool $value
+   *   TRUE if non-required properties should be in the returned element.
+   *
+   * @return $this
+   */
+  public function setDisplayNonRequired($value) {
+    $this->nonRequiredProperties = (bool) $value;
+
+    return $this;
+  }
+
+  /**
+   * Get the nonRequiredProperties property.
+   *
+   * @return bool
+   *   TRUE if the nonRequiredProperties property is TRUE.
+   */
+  public function getNonRequiredProperties() {
+    return $this->nonRequiredProperties;
+  }
+
+  /**
+   * Set the readOnlyProperties property.
+   *
+   * @param bool $value
+   *   TRUE if read-only properties should be in the returned element.
+   *
+   * @return $this
+   */
+  public function setDisplayReadOnly($value) {
+    $this->readOnlyProperties = (bool) $value;
+
+    return $this;
+  }
+
+  /**
+   * Get the readOnlyProperties property.
+   *
+   * @return bool
+   *   TRUE if the readOnlyProperties property is TRUE.
+   */
+  public function getDisplayReadOnly() {
+    return $this->readOnlyProperties;
+  }
+
+  /**
    * Get an element container for a complex data definition.
    *
    * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
@@ -399,6 +465,31 @@ class TypedElementBuilder {
     $element[] = $this->{$method}($property_definition);
 
     return $element;
+  }
+
+  /**
+   * Check whether or not to include the property in the returned element.
+   *
+   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   *   The data definition to check whether or not to display.
+   *
+   * @return bool
+   *   TRUE if the property should be displayed. Default to TRUE.
+   */
+  protected function shouldDisplay(DataDefinitionInterface $definition) {
+    $ret = TRUE;
+
+    if ($definition->isComputed()) {
+      $ret = FALSE;
+    }
+    elseif ($definition->isReadOnly() && (!$this->nonRequiredProperties || !$this->readOnlyProperties)) {
+      $ret = FALSE;
+    }
+    elseif (!$definition->isRequired() && !$this->nonRequiredProperties) {
+      $ret = FALSE;
+    }
+
+    return $ret;
   }
 
   /**

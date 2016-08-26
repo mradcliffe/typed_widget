@@ -28,8 +28,17 @@ class PrimitiveElementBuilder implements ElementBuilderInterface {
         in_array('Drupal\Core\TypedData\Type\FloatInterface', $implementations)) {
       $type = 'number';
     }
-    elseif ($definition->getConstraint('AllowedValues') || $definition->getConstraint('Choice')) {
-      $type = 'select';
+    elseif (!empty($definition->getConstraints())) {
+      $options = array_reduce($definition->getConstraints(), function(&$result, $item) {
+        if (isset($item['choices'])) {
+          $result = $item['choices'];
+        }
+        return $result;
+      }, []);
+
+      if (!empty($options)) {
+        $type = 'select';
+      }
     }
 
     return $type;
