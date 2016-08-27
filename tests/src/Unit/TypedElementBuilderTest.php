@@ -68,7 +68,7 @@ class TypedElementBuilderTest extends TypedElementTestBase {
 
     $this->assertTrue($elementBuilder->getNonRequiredProperties());
 
-    $elementBuilder->setDisplayNonRequired(FALSE);
+    $elementBuilder->setNonRequiredProperties(FALSE);
 
     $element = $elementBuilder->getElementFor('map');
 

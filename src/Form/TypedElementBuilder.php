@@ -382,7 +382,7 @@ class TypedElementBuilder {
    *
    * @return $this
    */
-  public function setDisplayNonRequired($value) {
+  public function setNonRequiredProperties($value) {
     $this->nonRequiredProperties = (bool) $value;
 
     return $this;
