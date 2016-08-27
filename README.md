@@ -2,6 +2,8 @@
 
 Typed Widget provides a service to dynamically create form elements based on [Typed Data](https://www.drupal.org/node/1794140) data types.
 
+[![Build Status](https://travis-ci.org/mradcliffe/typed_widget.svg?branch=8.x-1.x)](https://travis-ci.org/mradcliffe/typed_widget)
+
 ## Usage
 
 1. Get a form element for a primitive data type such as a ISO 8601 date.
