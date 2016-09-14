@@ -37,7 +37,7 @@ $formBuilder->setReadOnlyProperties(TRUE);
 $form = $formBuilder->getElementFor('xero_user');
 ```
 
-5. Get form element required for field propertie definitions without the context of an entity or form display.
+5. Get form element required for field property definitions without the context of an entity or form display.
 
 ```php
 $form['phone'] = $formBuilder->getElementFor('field_item:telephone');
@@ -62,3 +62,4 @@ $form = $formBuilder->getElementFor('entity:node', 'field_favorite_color', ['typ
 	* [ ] custom form handler
 	* [ ] custom view handler
 * [ ] Support typed config?
+* [ ] Support add more functionality for list elements.
