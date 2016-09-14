@@ -40,7 +40,7 @@ $form = $formBuilder->getElementFor('xero_user');
 5. Get form element required for field propertie definitions without the context of an entity or form display.
 
 ```php
-$form['phone'] = $formBuilder->getElementForA('field_item:telephone');
+$form['phone'] = $formBuilder->getElementFor('field_item:telephone');
 ```
 
 6. UNSTABLE: Get form elements for an Article node.

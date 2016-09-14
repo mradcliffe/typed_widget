@@ -30,11 +30,12 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
  *
  * // Get form element required for an entity type.
  * $form = $formBuilder->getElementFor('entity:user');
- * unset($form['#process']);
+ * unset($form['#process'][0]);
  * $mailElement = $formBuilder->getElementFor('entity:user', 'mail');
  *
  * // Get form elements required for an Article node.
  * $form = $formBuilder->getElementFor('entity:node', NULL, ['type' => 'article']);
+ * unset($form['#process][0]);
  *
  * // Get form element for the Favorite Color field attached to the Person node.
  * $element = $formBuilder->getElementFor('entity:node', 'field_favorite_color', ['type' => 'person']);
@@ -360,7 +361,8 @@ class TypedElementBuilder {
     $form_state = new FormState();
 
     try {
-      if ($this->entityTypeManager->hasHandler($entity_type, 'form')) {
+      $entity_type_definition = $this->entityTypeManager->getDefinition($entity_type, FALSE);
+      if ($entity_type_definition && $entity_type_definition->hasHandlerClass('form', 'default')) {
         $form = $this->entityTypeManager->getFormObject($entity_type, 'default');
         $form->setEntity($this->entityTypeManager->getStorage($entity_type)
           ->create($options));
@@ -451,6 +453,10 @@ class TypedElementBuilder {
 
     if ($type === 'fieldgroup') {
       $element['#description'] = $definition->getDescription() ? $definition->getDescription() : '';
+      $element['#title'] = $definition->getLabel() ? $definition->getLabel() : '';
+    }
+    elseif ($type === 'fieldset' && !$definition->getLabel()) {
+      $element['#type'] = 'container';
     }
     elseif ($type === 'fieldset') {
       $element['#description'] = $definition->getDescription() ? $definition->getDescription() : '';
@@ -472,7 +478,7 @@ class TypedElementBuilder {
    * @todo implement an add_more functionality.
    */
   public function getListElement(ListDataDefinitionInterface $definition) {
-    $element = $this->getParentContainer($definition);
+    $element = $this->getParentContainer($definition, 'fieldset');
 
     $property_definition = $definition->getItemDefinition();
     $method = $this->getMethod($property_definition);
