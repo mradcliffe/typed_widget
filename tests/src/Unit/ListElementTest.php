@@ -18,6 +18,8 @@ class ListElementTest extends TypedElementTestBase {
    */
   public function testGetListElement() {
     $expected = [
+      '#type' => 'container',
+      '#tree' => TRUE,
       [
         '#type' => 'textfield',
         '#title' => 'Text',
@@ -44,7 +46,7 @@ class ListElementTest extends TypedElementTestBase {
     );
 
     $element = $elementBuilder->getElementFor('list');
-    $this->assertEquals($expected, $element);
+    $this->assertArrayEquals($expected, $element);
   }
 
 }

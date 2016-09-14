@@ -19,8 +19,10 @@ class ComplexElementTest extends TypedElementTestBase {
    */
   public function testGetComplexElement() {
     $expected = [
-      '#type' => 'container',
+      '#type' => 'fieldset',
       '#tree' => TRUE,
+      '#title' => 'Map',
+      '#description' => '',
       'text' => [
         '#type' => 'textfield',
         '#title' => 'Text',
@@ -63,8 +65,8 @@ class ComplexElementTest extends TypedElementTestBase {
     );
 
     $element = $elementBuilder->getElementFor('map');
-    $this->assertEquals($expected, $element);
-    $this->assertEquals($expected['text'], $elementBuilder->getElementFor('map', 'text'));
+    $this->assertArrayEquals($expected, $element);
+    $this->assertArrayEquals($expected['text'], $elementBuilder->getElementFor('map', 'text'));
   }
 
   /**
@@ -72,18 +74,20 @@ class ComplexElementTest extends TypedElementTestBase {
    */
   public function testGetElementForData() {
     $expected = [
-      '#type' => 'container',
+      '#type' => 'fieldset',
+      '#title' => 'Map',
+      '#description' => '',
       '#tree' => TRUE,
       'text' => [
         '#type' => 'textfield',
         '#title' => 'Text',
-        '#description' => ''
+        '#description' => '',
       ],
       'number' => [
         '#type' => 'number',
         '#title' => 'Number',
-        '#description' => ''
-      ]
+        '#description' => '',
+      ],
     ];
 
     $stringDefinition = DataDefinition::create('string');
@@ -122,6 +126,7 @@ class ComplexElementTest extends TypedElementTestBase {
     );
 
     $element = $elementBuilder->getElementForData($map);
-    $this->assertEquals($expected, $element);
+    $this->assertArrayEquals($expected, $element);
   }
+
 }

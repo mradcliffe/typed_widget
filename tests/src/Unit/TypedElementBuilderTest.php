@@ -36,6 +36,7 @@ class TypedElementBuilderTest extends TypedElementTestBase {
       ->setLabel('Default Property');
 
     $this->definition = MapDataDefinition::create('map');
+    $this->definition->setLabel('Map');
     $this->definition->setPropertyDefinition('required', $requiredDefinition);
     $this->definition->setPropertyDefinition('readonly', $readOnlyDefinition);
     $this->definition->setPropertyDefinition('default', $defaultDefinition);
@@ -49,7 +50,9 @@ class TypedElementBuilderTest extends TypedElementTestBase {
    */
   public function testHideNonRequiredProperties() {
     $expected = [
-      '#type' => 'container',
+      '#type' => 'fieldset',
+      '#title' => 'Map',
+      '#description' => '',
       '#tree' => TRUE,
       'required' => [
         '#type' => 'textfield',
@@ -80,7 +83,9 @@ class TypedElementBuilderTest extends TypedElementTestBase {
    */
   public function testShowReadOnlyProperties() {
     $expected = [
-      '#type' => 'container',
+      '#type' => 'fieldset',
+      '#title' => 'Map',
+      '#description' => '',
       '#tree' => TRUE,
       'required' => [
         '#type' => 'textfield',

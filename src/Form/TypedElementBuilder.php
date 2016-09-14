@@ -180,8 +180,11 @@ class TypedElementBuilder {
    *
    * @param \Drupal\Core\TypedData\TypedDataInterface $data
    *   The typed data to generate a render element for.
+   *
    * @return array
    *   A render element.
+   *
+   * @throws PluginNotFoundException
    */
   public function getElementForData(TypedDataInterface $data) {
     try {
@@ -201,6 +204,7 @@ class TypedElementBuilder {
    *
    * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
    *   The typed data definition.
+   *
    * @return array
    *   A form element.
    */
@@ -242,7 +246,7 @@ class TypedElementBuilder {
 
     // Create a container element for the complex data type.
     if (count($definitions) > 1) {
-      $element = $this->getParentContainer($parent_definition);
+      $element = $this->getParentContainer($parent_definition, 'fieldset');
     }
 
     /** @var \Drupal\Core\TypedData\DataDefinitionInterface $definition */
@@ -356,12 +360,18 @@ class TypedElementBuilder {
     $form_state = new FormState();
 
     try {
-      $form = $this->entityTypeManager->getFormObject($entity_type, 'default');
-      $form->setEntity($this->entityTypeManager->getStorage($entity_type)->create($options));
-      $element = $form->buildForm([], $form_state);
+      if ($this->entityTypeManager->hasHandler($entity_type, 'form')) {
+        $form = $this->entityTypeManager->getFormObject($entity_type, 'default');
+        $form->setEntity($this->entityTypeManager->getStorage($entity_type)
+          ->create($options));
+        $element = $form->buildForm([], $form_state);
 
-      // Remove actions.
-      unset($element['actions']);
+        // Remove actions.
+        unset($element['actions']);
+      }
+      else {
+        $element = $this->getComplexElement($entity_definition);
+      }
     }
     catch (InvalidPluginDefinitionException $e) {
       // Fallback to complex data definition.
@@ -442,6 +452,10 @@ class TypedElementBuilder {
     if ($type === 'fieldgroup') {
       $element['#description'] = $definition->getDescription() ? $definition->getDescription() : '';
     }
+    elseif ($type === 'fieldset') {
+      $element['#description'] = $definition->getDescription() ? $definition->getDescription() : '';
+      $element['#title'] = $definition->getLabel();
+    }
 
     return $element;
   }
@@ -458,7 +472,7 @@ class TypedElementBuilder {
    * @todo implement an add_more functionality.
    */
   public function getListElement(ListDataDefinitionInterface $definition) {
-    $element = [];
+    $element = $this->getParentContainer($definition);
 
     $property_definition = $definition->getItemDefinition();
     $method = $this->getMethod($property_definition);
