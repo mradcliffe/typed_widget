@@ -1,11 +1,19 @@
 language: php
 
-php:
-  - 5.6
-  - 7.0
-
-env:
-  - DRUPAL=8.1.x-dev
+matrix:
+  include:
+    - php: 5.6
+      env: DRUPAL=8.1.x-dev
+    - php: 7.0
+      env: DRUPAL=8.1.x-dev
+    - php: 5.6
+      env: DRUPAL=8.2.x-dev
+    - php: 5.6
+      env: DRUPAL=8.3.x-dev
+  allow_failures:
+    - php: 5.6
+      env: DRUPAL=8.3.x-dev
+  fast_finish: true
 
 git:
   depth: 1
